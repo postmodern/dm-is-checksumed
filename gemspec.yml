@@ -1,0 +1,19 @@
+name: dm-is-checksumed
+version: 0.1.0
+summary: Adds checksum properties to DataMapper Models.
+description:
+  A DataMapper plugin which adds checksum properties to a Model,
+  associated with another property.
+
+license: MIT
+authors: Postmodern
+email: postmodern.mod3@gmail.com
+homepage: http://github.com/postmodern/dm-is-checksumed
+has_yard: true
+
+dependencies:
+  dm-core: ~> 1.0
+
+development_dependencies:
+  yard: ~> 0.6.0
+  bundler: ~> 1.0.0
