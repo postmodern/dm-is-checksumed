@@ -104,7 +104,7 @@ module DataMapper
             :length => 64,
             :required => true,
             :default => lambda { |resource,property|
-              calculate_checksum(resource.get_attribute(name))
+              calculate_checksum(resource.attribute_get(name))
             }
           }
 
