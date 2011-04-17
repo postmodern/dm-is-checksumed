@@ -11,6 +11,6 @@ class Url
 
   property :url, Text, :required => true
 
-  checksum_property :url
+  checksum :url
 
 end

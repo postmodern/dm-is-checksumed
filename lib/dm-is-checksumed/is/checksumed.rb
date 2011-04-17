@@ -98,7 +98,7 @@ module DataMapper
         #   Specifies whether the checksums are to be unique, or if
         #   duplicates are allowed.
         #
-        def checksum_property(name,options={})
+        def checksum(name,options={})
           # build the checksum property options
           property_options = {
             :length => 64,
