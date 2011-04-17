@@ -49,10 +49,30 @@ module DataMapper
           Digest::SHA256.hexdigest(data.to_s)
         end
 
+        #
+        # Substitutes any checksumed properties with the checksums of their
+        # values.
+        #
+        # @param [DataMapper::Undefined, DataMapper::Query, Hash] query
+        #   The query.
+        #
+        # @return [DataMapper::Resource, nil]
+        #   The matching resource.
+        #
         def first(query=Undefined)
           super(checksum_query(query))
         end
 
+        #
+        # Substitutes any checksumed properties with the checksums of their
+        # values.
+        #
+        # @param [DataMapper::Undefined, DataMapper::Query, Hash] query
+        #   The query.
+        #
+        # @return [DataMapper::Collection]
+        #   The matching resources.
+        #
         def all(query=Undefined)
           super(checksum_query(query))
         end
