@@ -1,6 +1,7 @@
 # dm-is-checksumed
 
-* [Homepage](http://github.com/postmodern/dm-is-checksumed)
+* [Source](http://github.com/postmodern/dm-is-checksumed)
+* [Issues](http://github.com/postmodern/dm-is-checksumed/issues)
 * [Documentation](http://rubydoc.info/gems/dm-is-checksumed/frames)
 * [Email](mailto:postmodern.mod3 at gmail.com)
 
