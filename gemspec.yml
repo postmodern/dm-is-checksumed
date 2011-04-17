@@ -3,7 +3,7 @@ version: 0.1.0
 summary: Adds checksum properties to DataMapper Models.
 description:
   A DataMapper plugin which adds checksum properties to a Model,
-  associated with another property.
+  associated with other properties.
 
 license: MIT
 authors: Postmodern

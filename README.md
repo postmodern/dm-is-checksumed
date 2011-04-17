@@ -6,7 +6,8 @@
 
 ## Description
 
-Adds checksum properties to a Model, associated with another property.
+dm-is-checksumed is a DataMapper plugin which adds checksum properties to a
+Model, associated with other properties.
 
 ## Features
 
