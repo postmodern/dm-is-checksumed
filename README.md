@@ -29,7 +29,7 @@ Model, associated with other properties.
 
       property :url, Text
 
-      checksum_property :url
+      checksum :url
 
     end
 
