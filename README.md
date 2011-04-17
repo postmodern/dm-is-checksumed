@@ -7,13 +7,16 @@
 
 ## Description
 
-A DataMapper plugin which adds checksum properties to a Model, associated
-with other properties.
+A DataMapper plugin which adds checksum properties to a Model, referencing
+other properties.
 
 ## Features
 
 * Uses sha256
 * Allows unique and non-unique checksums.
+* Automatically substitutes in checksums in queries to avoid expensive
+  queries.
+* Works with `first_or_create` and `first_or_new`.
 
 ## Examples
 
@@ -27,16 +30,24 @@ with other properties.
 
       property :id, Serial
 
+      # The property to be checksumed
       property :url, Text
 
+      # Defines the `url_checksum` property, referencing `url`
       checksum :url
 
     end
 
+    # Checksums are automatically calculated
     url = Url.create(:url => 'http://example.com/extremely/long/url....')
     url.url_checksum
     # => "b74d7288b86817dea55bd044d3cedc013e83518b461cd6f202be85e33d95715b"
 
+    # Checksums are automatically substituted into queries
+    url = Url.first(:url => 'http://example.com/same/huge/url')
+    # ~ (0.000116) SELECT "id", "url_checksum" FROM "urls" WHERE "url_checksum" = 'b74d7288b86817dea55bd044d3cedc013e83518b461cd6f202be85e33d95715b' ORDER BY "id" LIMIT 1
+
+    # Works with first_or_create and first_or_new
     url = Url.first_or_create(:url => 'http://example.com/same/huge/url')
     url.url_checksum
     # => "b74d7288b86817dea55bd044d3cedc013e83518b461cd6f202be85e33d95715b"
