@@ -9,6 +9,7 @@ module DataMapper
       #
       def is_checksumed(options={})
         extend DataMapper::Is::Checksumed::ClassMethods
+        include DataMapper::Is::Checksumed::InstanceMethods
       end
 
       module ClassMethods
@@ -103,27 +104,6 @@ module DataMapper
           super(checksum_query(query))
         end
 
-        #
-        # Updates the checksums and saves the resource.
-        #
-        # @param [Array] arguments
-        #   Additional arguments passed to `save`.
-        #
-        # @return [Boolean]
-        #   Specifies whether the resource was successfully saved.
-        #
-        # @since 0.2.0
-        #
-        def save(*arguments)
-          checksumed_properties.each do |name|
-            if attribute_dirty?(name)
-              attribute_set(:"#{name}_checksum",calculate_checksum(attribute_get(name)))
-            end
-          end
-
-          super(*arguments)
-        end
-
         protected
 
         #
@@ -159,6 +139,29 @@ module DataMapper
           checksumed_properties << name
         end
       end # ClassMethods
+
+      module InstanceMethods
+        #
+        # Updates the checksums and saves the resource.
+        #
+        # @param [Array] arguments
+        #   Additional arguments passed to `save`.
+        #
+        # @return [Boolean]
+        #   Specifies whether the resource was successfully saved.
+        #
+        # @since 0.2.0
+        #
+        def save(*arguments)
+          self.class.checksumed_properties.each do |name|
+            if attribute_dirty?(name)
+              attribute_set(:"#{name}_checksum",self.class.calculate_checksum(name))
+            end
+          end
+
+          super(*arguments)
+        end
+      end # InstanceMethods
     end # Checksumed
   end # Is
 end # DataMapper
