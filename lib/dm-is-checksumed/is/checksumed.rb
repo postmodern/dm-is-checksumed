@@ -125,7 +125,7 @@ module DataMapper
             :length => 64,
             :required => true,
             :default => lambda { |resource,property|
-              calculate_checksum(resource.attribute_get(name))
+              resource.checksum_attribute(name)
             }
           }
 
@@ -142,6 +142,24 @@ module DataMapper
 
       module InstanceMethods
         #
+        # Calculates the checksum of an attribute.
+        #
+        # @param [Symbol] name
+        #   The name of the attribute.
+        #
+        # @return [String]
+        #   The checksum of the attribute.
+        #
+        # @since 0.2.0
+        #
+        def checksum_attribute(name)
+          checksum = Digest::SHA256.hexdigest(attribute_get(name))
+
+          attribute_set(:"#{name}_checksum",checksum)
+          return checksum
+        end
+
+        #
         # Updates the checksums and saves the resource.
         #
         # @param [Array] arguments
@@ -154,9 +172,7 @@ module DataMapper
         #
         def save(*arguments)
           self.class.checksumed_properties.each do |name|
-            if attribute_dirty?(name)
-              attribute_set(:"#{name}_checksum",self.class.calculate_checksum(name))
-            end
+            checksum_attribute(name) if attribute_dirty?(name)
           end
 
           super(*arguments)
