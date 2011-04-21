@@ -1,5 +1,5 @@
 name: dm-is-checksumed
-version: 0.1.0
+version: 0.2.0
 summary: Adds checksum properties to DataMapper Models.
 description:
   A DataMapper plugin which adds checksum properties to a Model,
