@@ -37,4 +37,21 @@ describe DataMapper::Is::Checksumed do
       resources[0].url.should == url
     end
   end
+
+  context "save" do
+    before(:all) do
+      subject.create(:url => 'http://baz/')
+    end
+
+    let(:new_url) { 'http://quix.com/' }
+    let(:new_url_checksum) { 'ffa401de5b7112016252d589ecf2606e5addcde0dcbeb4240a555759b83a5506' }
+
+    it "should update the checksum properties before saving dirty properties" do
+      resource = subject.last
+      resource.url = new_url
+      resource.save
+
+      resource.url_checksum.should == new_url_checksum
+    end
+  end
 end

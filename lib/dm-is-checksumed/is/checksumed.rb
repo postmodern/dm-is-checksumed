@@ -103,6 +103,27 @@ module DataMapper
           super(checksum_query(query))
         end
 
+        #
+        # Updates the checksums and saves the resource.
+        #
+        # @param [Array] arguments
+        #   Additional arguments passed to `save`.
+        #
+        # @return [Boolean]
+        #   Specifies whether the resource was successfully saved.
+        #
+        # @since 0.2.0
+        #
+        def save(*arguments)
+          checksumed_properties.each do |name|
+            if attribute_dirty?(name)
+              attribute_set(:"#{name}_checksum",calculate_checksum(attribute_get(name)))
+            end
+          end
+
+          super(*arguments)
+        end
+
         protected
 
         #
