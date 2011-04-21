@@ -50,6 +50,32 @@ module DataMapper
         end
 
         #
+        # Filters a query, replacing the checksumed properties, with their
+        # accompanying checksums.
+        #
+        # @param [Hash, DataMapper::Undefined] query
+        #   The query to filter.
+        #
+        # @return [Hash, DataMapper::Undefined]
+        #   The filtered query.
+        #
+        def checksum_query(query)
+          return query unless query.kind_of?(Hash)
+
+          new_query = {}
+
+          query.each do |name,value|
+            if (name.respond_to?(:to_sym) && checksumed_properties.include?(name.to_sym))
+              new_query[:"#{name}_checksum"] = calculate_checksum(value)
+            else
+              new_query[name] = value
+            end
+          end
+
+          return new_query
+        end
+
+        #
         # Substitutes any checksumed properties with the checksums of their
         # values.
         #
@@ -75,32 +101,6 @@ module DataMapper
         #
         def all(query=Undefined)
           super(checksum_query(query))
-        end
-
-        #
-        # Filters a query, replacing the checksumed properties, with their
-        # accompanying checksums.
-        #
-        # @param [Hash, DataMapper::Undefined] query
-        #   The query to filter.
-        #
-        # @return [Hash, DataMapper::Undefined]
-        #   The filtered query.
-        #
-        def checksum_query(query)
-          return query unless query.kind_of?(Hash)
-
-          new_query = {}
-
-          query.each do |name,value|
-            if (name.respond_to?(:to_sym) && checksumed_properties.include?(name.to_sym))
-              new_query[:"#{name}_checksum"] = calculate_checksum(value)
-            else
-              new_query[name] = value
-            end
-          end
-
-          return new_query
         end
 
         protected
