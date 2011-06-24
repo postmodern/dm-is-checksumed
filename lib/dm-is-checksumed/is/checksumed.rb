@@ -12,6 +12,21 @@ module DataMapper
         include DataMapper::Is::Checksumed::InstanceMethods
       end
 
+      #
+      # Calculates the SHA256 checksum of the given data.
+      #
+      # @param [#to_s] data
+      #   The data to checksum.
+      #
+      # @return [String]
+      #   The SHA256 hex-digest of the data.
+      #
+      # @since 0.2.0
+      #
+      def self.checksum(data)
+        Digest::SHA256.hexdigest(data.to_s)
+      end
+
       module ClassMethods
         #
         # The properties which have accompanying checksums.
@@ -38,19 +53,6 @@ module DataMapper
         end
 
         #
-        # Calculates the SHA256 checksum of the given data.
-        #
-        # @param [#to_s] data
-        #   The data to checksum.
-        #
-        # @return [String]
-        #   The SHA256 hex-digest of the data.
-        #
-        def calculate_checksum(data)
-          Digest::SHA256.hexdigest(data.to_s)
-        end
-
-        #
         # Filters a query, replacing the checksumed properties, with their
         # accompanying checksums.
         #
@@ -67,7 +69,7 @@ module DataMapper
 
           query.each do |name,value|
             if (name.respond_to?(:to_sym) && checksumed_properties.include?(name.to_sym))
-              new_query[:"#{name}_checksum"] = calculate_checksum(value)
+              new_query[:"#{name}_checksum"] = Checksumed.checksum(value)
             else
               new_query[name] = value
             end
@@ -153,7 +155,7 @@ module DataMapper
         # @since 0.2.0
         #
         def checksum_attribute(name)
-          checksum = Digest::SHA256.hexdigest(attribute_get(name))
+          checksum = Checksumed.checksum(attribute_get(name))
 
           attribute_set(:"#{name}_checksum",checksum)
           return checksum

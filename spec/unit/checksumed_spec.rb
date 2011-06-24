@@ -2,8 +2,21 @@ require 'spec_helper'
 require 'models/url'
 
 describe DataMapper::Is::Checksumed do
-  subject { Url }
+  describe "Checksumed[]" do
+    subject { DataMapper::Is::Checksumed }
 
+    let(:expected) { '2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824' }
+
+    it "should calculate SHA256 checksums" do
+      subject.checksum('hello').should == expected
+    end
+
+    it "should convert non-Strings to Strings" do
+      subject.checksum(:hello).should == expected
+    end
+  end
+
+  subject { Url }
   before(:all) { subject.auto_migrate! }
 
   it "should record which properties are checksumed" do
@@ -16,18 +29,6 @@ describe DataMapper::Is::Checksumed do
 
   it "should make the checksum properties unique by default" do
     subject.properties[:url_checksum].should be_unique
-  end
-
-  describe "checksum" do
-    let(:expected) { '2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824' }
-
-    it "should calculate SHA256 checksums" do
-      subject.calculate_checksum('hello').should == expected
-    end
-
-    it "should convert non-Strings to Strings" do
-      subject.calculate_checksum(:hello).should == expected
-    end
   end
 
   describe "checksum_query" do
