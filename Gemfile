@@ -80,63 +80,71 @@
 # Gemfile.lock is added to the .gitignore file, so you don't need to worry
 # about accidentally checking it into version control.
 
-source :rubygems
+source 'https://rubygems.org'
 
-DATAMAPPER = 'http://github.com/datamapper'
-DM_VERSION = '~> 1.0'
-DO_VERSION = '~> 0.10.2'
-DM_DO_ADAPTERS = %w[sqlite postgres mysql oracle sqlserver]
-RAILS = 'http://github.com/rails/rails.git'
+gemspec
 
-if ENV['EXTLIB']
-  gem 'extlib',         '~> 0.9.15', :git => "#{DATAMAPPER}/extlib.git",
-                                     :require => nil
+if ENV['DM_EDGE']
+  SOURCE    = :git
+  DM_URI    = 'https://github.com/datamapper'
+  DM_BRANCH = ENV.fetch('DM_BRANCH', 'master')
+elsif ENV['DM_ROOT']
+  SOURCE    = :path
+  DM_ROOT   = File.expand_path(ENV['DM_ROOT'])
 else
-  gem 'activesupport',  '~> 3.0.4', :require => nil
-  gem 'i18n',           '~> 0.5.0'
+  SOURCE    = :gem
 end
 
-gem 'dm-core',	DM_VERSION, :git => "#{DATAMAPPER}/dm-core.git"
+DM_VERSION  = '~> 1.2'
+DO_VERSION  = '~> 0.10.6'
+DO_ADAPTERS = %w[ sqlite postgres mysql oracle sqlserver ]
 
-group :development do
-  gem 'rake',		    '~> 0.8.7'
+def dm_gem(name,repo=name)
+  options = case SOURCE
+            when :git
+              {:git => "#{DM_URI}/#{repo}.git", :branch => DM_BRANCH}
+            when :path
+              {:path => "#{DM_ROOT}/#{repo}"}
+            end
 
-  gem 'rubygems-tasks',	'~> 0.1'
-  gem 'rspec',          '~> 2.4'
+  gem name, DM_VERSION, options
+end
 
-  gem 'kramdown',   '~> 0.12.0'
-  gem 'yard',		    '~> 0.6.0'
+def do_gem(name)
+  dm_gem name, 'do'
 end
 
 group :datamapper do
-  # We need this because we want to pin these dependencies to their git
-  # master sources
+
+  dm_gem 'dm-core'
 
   adapters = ENV['ADAPTER'] || ENV['ADAPTERS']
   adapters = adapters.to_s.tr(',', ' ').split.uniq - %w[ in_memory ]
 
-  if (do_adapters = DM_DO_ADAPTERS & adapters).any?
-    options = {}
-    options[:git] = "#{DATAMAPPER}/do.git" if ENV['DO_GIT'] == 'true'
-
-    gem 'data_objects',  DO_VERSION, options.dup
+  if (do_adapters = DO_ADAPTERS & adapters).any?
+    do_gem 'data_objects'
 
     do_adapters.each do |adapter|
       adapter = 'sqlite3' if adapter == 'sqlite'
-      gem "do_#{adapter}", DO_VERSION, options.dup
+      do_gem "do_#{adapter}"
     end
 
-    gem 'dm-do-adapter', DM_VERSION, :git => "#{DATAMAPPER}/dm-do-adapter.git"
+    dm_gem 'dm-do-adapter'
   end
 
-  adapters.each do |adapter|
-    gem "dm-#{adapter}-adapter", DM_VERSION, :git => "#{DATAMAPPER}/dm-#{adapter}-adapter.git"
-  end
+  adapters.each { |adapter| dm_gem "dm-#{adapter}-adapter" }
 
   plugins = ENV['PLUGINS'] || ENV['PLUGIN']
   plugins = plugins.to_s.tr(',', ' ').split.push('dm-migrations').uniq
 
-  plugins.each do |plugin|
-    gem plugin, DM_VERSION, :git => "#{DATAMAPPER}/#{plugin}.git"
-  end
+  plugins.each { |plugin| dm_gem plugin }
+
+end
+
+group :development do
+  gem 'rake',             '~> 10.0'
+  gem 'rubygems-tasks',   '~> 0.1'
+  gem 'rspec',            '~> 2.4'
+
+  gem 'kramdown',   '~> 0.12'
 end
